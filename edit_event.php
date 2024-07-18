@@ -13,7 +13,20 @@ $client->setAccessToken($_SESSION['access_token']);
 
 $service = new Google_Service_Calendar($client);
 
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    $event = $service->events->get('avigitmandal0@gmail.com', $_POST['id']);
+    $event->setSummary($_POST['summary']);
+    $event->setStart(new Google_Service_Calendar_EventDateTime(['dateTime' => $_POST['start'], 'timeZone' => 'Asia/Kathmandu']));
+    $event->setEnd(new Google_Service_Calendar_EventDateTime(['dateTime' => $_POST['end'], 'timeZone' => 'Asia/Kathmandu']));
 
+    $service->events->update('avigitmandal0@gmail.com', $event->getId(), $event);
+    header('Location: list_events.php');
+} else {
+    $event = $service->events->get('avigitmandal0@gmail.com', $_GET['id']);
+    $summary = $event->getSummary();
+    $start = date('Y-m-d\TH:i', strtotime($event->getStart()->getDateTime()));
+    $end = date('Y-m-d\TH:i', strtotime($event->getEnd()->getDateTime()));
+}
 ?>
 
 <form method="POST">
